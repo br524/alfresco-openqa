@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>Articles by Author</shortname>
-  <description>Get Articles By Author Web Script</description>
-  <url>/articles?author={author}</url>
-  <format default="xml"/>
-  <authentication>admin</authentication>
-</webscript>
