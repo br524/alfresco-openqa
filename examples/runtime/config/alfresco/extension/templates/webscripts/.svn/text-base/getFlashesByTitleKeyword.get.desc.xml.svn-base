@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>News Flashes by Title Keyword</shortname>
-  <description>Get News Flashes By Title Keyword Web Script</description>
-  <url>/flashes?titleKeyword={titleKeyword}</url>
-  <format default="xml"/>
-  <authentication>admin</authentication>
-</webscript>
