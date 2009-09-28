@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/repos/field/!svn/ver/404/WcmOffSiteChallenge/asr/config/alfresco/extension/templates/webscripts
+END
+getFlashesByTitleKeyword.get.desc.xml
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/repos/field/!svn/ver/404/WcmOffSiteChallenge/asr/config/alfresco/extension/templates/webscripts/getFlashesByTitleKeyword.get.desc.xml
+END
+getFlashesByTitleKeyword.get.xml.ftl
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/repos/field/!svn/ver/404/WcmOffSiteChallenge/asr/config/alfresco/extension/templates/webscripts/getFlashesByTitleKeyword.get.xml.ftl
+END
+getArticlesByAuthor.get.xml.ftl
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repos/field/!svn/ver/404/WcmOffSiteChallenge/asr/config/alfresco/extension/templates/webscripts/getArticlesByAuthor.get.xml.ftl
+END
+getArticlesByAuthor.get.js
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/repos/field/!svn/ver/404/WcmOffSiteChallenge/asr/config/alfresco/extension/templates/webscripts/getArticlesByAuthor.get.js
+END
+getArticlesByAuthor.get.desc.xml
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/repos/field/!svn/ver/404/WcmOffSiteChallenge/asr/config/alfresco/extension/templates/webscripts/getArticlesByAuthor.get.desc.xml
+END
+getFlashesByTitleKeyword.get.js
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repos/field/!svn/ver/404/WcmOffSiteChallenge/asr/config/alfresco/extension/templates/webscripts/getFlashesByTitleKeyword.get.js
+END

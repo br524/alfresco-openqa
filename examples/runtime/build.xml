@@ -1,0 +1,187 @@
+<project name="asrTestingModuleProject" default="package-production-amp">
+
+    <property file="build.properties"/>
+
+    <property name="project.dir" value="."/>
+    <property name="build.dir" value="${project.dir}/build"/>
+    <property name="config.dir" value="${project.dir}/config"/>
+    <property name="jar.file" value="${build.dir}/lib/${prop.jar.file}.jar"/>
+    <property name="amp.file" value="${build.dir}/dist/${prop.jar.file}-authoring.amp"/>
+    <property name="amp.asr.file" value="${build.dir}/dist/${prop.jar.file}-asr.amp"/>
+    <property name="src.file" value="${build.dir}/dist/${prop.jar.file}-src.zip"/>
+
+    <target name="mkdirs">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.dir}/dist"/>
+        <mkdir dir="${build.dir}/lib"/>
+        <mkdir dir="${build.dir}/config"/>
+        <mkdir dir="${build.dir}/config/alfresco"/>
+        <mkdir dir="${build.dir}/config/alfresco/module"/>
+        <mkdir dir="${build.dir}/config/alfresco/module/asrTestingModule"/>
+    </target>
+
+    <target name="install" depends="mkdirs">
+        <copy todir="${home.tomcat}/shared/classes" verbose="${copy.verbose}">
+
+            <!-- copy content model and web config -->
+            <fileset dir="config">
+                <include name="**/webscripts/*.xml"/>
+                <include name="**/webscripts/*.ftl"/>
+                <include name="**/webscripts/*.js"/>
+
+                <!--<exclude name="alfresco/web-client-config-wcm.xml"/>-->
+                <!--<exclude name="alfresco/module/workflow-invoices/module-context.xml"/>-->
+            </fileset>
+        </copy>
+
+        <!--<copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes" verbose="${copy.verbose}">-->
+
+             <!--copy class files -->
+            <!--<fileset dir="${build.dir}/classes"/>-->
+
+             <!--copy class files -->
+            <!--<fileset dir="${project.dir}">-->
+                <!--<include name="log4j.properties" />-->
+            <!--</fileset>-->
+
+             <!--copy content model and web config -->
+            <!--<fileset dir="config">-->
+                <!--<include name="alfresco/web-client-config-wcm.xml"/>-->
+            <!--</fileset>-->
+        <!--</copy>-->
+    </target>
+
+
+    <target name="clean">
+        <delete dir="${build.dir}/dist"/>
+        <delete dir="${build.dir}/lib"/>
+        <delete dir="${build.dir}/classes"/>
+        <delete dir="${build.dir}/config"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <path id="class.path">
+        <dirset dir="${build.dir}"/>
+        <fileset dir="${sdk.root}/lib/server" includes="**/*.jar"/>
+    </path>
+
+    <target name="compile" depends="mkdirs">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac target="${java.target}" debug="on" classpathref="class.path" srcdir="${project.dir}/source/main/java"
+               destdir="${build.dir}/classes"/>
+    </target>
+
+    <target name="package-jar" depends="compile">
+        <jar destfile="${jar.file}">
+            <fileset dir="${build.dir}/classes" includes="**/*.class"/>
+            <fileset dir="${project.dir}/source/main/java" includes="**/*.properties"/>
+            <fileset dir="${project.dir}/source/main/java" includes="META-INF/*.*"/>
+        </jar>
+    </target>
+
+    <target name="package-developer-amp" depends="package-jar" description="Package the Module">
+    <!--<target name="package-developer-amp" depends="package-jar" description="Package the Module">-->
+        <zip destfile="${amp.file}">
+            <!--<fileset dir="${project.dir}/source" includes="web/**/*.*"/>-->
+            <!--<fileset dir="${project.dir}/build" includes="lib/*.jar"/>-->
+            <fileset dir="${project.dir}/config" includes="module.properties"/>
+            <fileset dir="${project.dir}" includes="config/**/*.*" excludes="**/module.properties"/>
+            <!--<fileset dir="${project.dir}/">-->
+                <!--<include name="config/log4j.properties"/>-->
+                <!--<include name="config/alfresco/extension/web-client-config-custom.xml"/>-->
+                <!--<include name="config/alfresco/extension/templates/**/*.xml"/>-->
+                <!--<include name="config/alfresco/extension/templates/**/*.ftl"/>-->
+                <!--<include name="config/alfresco/extension/webclient.properties"/>-->
+                <!--<include name="config/alfresco/module/workflow-invoices/module-context.xml"/>-->
+                <!--<include name="config/alfresco/module/**/*.*"/>-->
+                <!--<exclude name="config/alfresco/module/**/processdefinition.xml"/>-->
+                <!--<exclude name="config/alfresco/module/**/invoicesModel.xml"/>-->
+                <!--<exclude name="config/alfresco/module/**/invoicesProcess.properties"/>-->
+            <!--</fileset>-->
+        </zip>
+    </target>
+
+    <target name="asrModuleContextPrep" description="Copies ASR-only module context to build directory for inclusion in AMP">
+        <copy todir="${build.dir}/config/alfresco/module/asrTestingModule" verbose="${copy.verbose}">
+
+            <!-- copy content model and web config -->
+            <fileset dir="config">
+                <include name="**/asr-module-context.xml" />
+            </fileset>
+        </copy>
+        <copy file="${project.dir}/config/alfresco/module/asrTestingModule/asr-module-context.xml" tofile="${build.dir}/config/alfresco/module/asrTestingModule/module-context.xml"/>
+    </target>
+
+    <!--<target name="package-production-amp" depends="package-jar" description="Package the Module">-->
+    <target name="package-production-amp" depends="mkdirs,asrModuleContextPrep" description="Package the Module">
+        <zip destfile="${amp.file}">
+            <!--<fileset dir="${project.dir}/source" includes="web/**/*.*"/>-->
+            <!--<fileset dir="${project.dir}/build" includes="lib/*.jar"/>-->
+            <fileset dir="${project.dir}/config" includes="module.properties"/>
+            <fileset dir="${project.dir}" includes="config/**/*.*" excludes="**/module.properties">
+                <exclude name="config/**/asr-module-context.xml" />
+                <include name="config/**/module-context.xml" />
+                <exclude name="config/**/webscripts/*" />
+            </fileset>
+            <!--<fileset dir="${project.dir}/">-->
+                <!--<include name="config/log4j.properties"/>-->
+                <!--<include name="config/alfresco/web-client-config-wcm.xml"/>-->
+                <!--<include name="config/alfresco/extension/templates/**/*.xml"/>-->
+                <!--<include name="config/alfresco/extension/templates/**/*.ftl"/>-->
+                <!--<include name="config/alfresco/extension/webclient.properties"/>-->
+                <!--<include name="config/alfresco/extension/*-context.xml"/>-->
+                <!--<include name="config/alfresco/extension/workflow/*"/>-->
+                <!--<include name="config/alfresco/module/workflow-invoices/module-context.xml"/>-->
+            <!--</fileset>-->
+        </zip>
+        <zip destfile="${amp.asr.file}">
+            <!--<fileset dir="${project.dir}/source" includes="web/**/*.*"/>-->
+            <!--<fileset dir="${project.dir}/build" includes="lib/*.jar"/>-->
+            <fileset dir="${project.dir}/config" includes="module.properties"/>
+            <fileset dir="${project.dir}" >
+                <exclude name="config/**/asr-test-wcm-xml-metadata-extraction-context.xml" />
+                <exclude name="config/**/module-context.xml" />
+                <include name="config/**/*.*" />
+            </fileset>
+            <fileset dir="${build.dir}" >
+                <include name="config/**/module-context.xml" />
+            </fileset>
+<!--
+config/alfresco/module/asrTestingModule/asr-module-context.xml
+-->
+        </zip>
+    </target>
+
+    <target name="update-developer-war" depends="package-developer-amp" description="Update the WAR file.  Set -Dwar.file=...">
+        <echo>Installing SDK Demo AMP into WAR</echo>
+        <java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool">
+            <classpath refid="class.path"/>
+            <arg line="install ${amp.file} ${war.file} -force -verbose"/>
+        </java>
+    </target>
+
+    <target name="update-production-war" depends="package-production-amp" description="Update the WAR file.  Set -Dwar.file=...">
+        <echo>Installing SDK Demo AMP into WAR</echo>
+        <java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool">
+            <classpath refid="class.path"/>
+            <arg line="install ${amp.file} ${war.file} -force -verbose"/>
+        </java>
+    </target>
+
+    <target name="src-zip" description="Package the source for January release only">
+        <zip destfile="${src.file}">
+            <!--<fileset dir="${project.dir}/source" includes="java/**/*.*"/>-->
+            <!--<fileset dir="${project.dir}/config" includes="module.properties"/>-->
+            <fileset dir="${project.dir}/">
+                <include name="config/**/*"/>
+                <include name="source/**/*"/>
+                <exclude name="**/RunAsAVMReleaseTestServerHandler.java"/>
+                <exclude name="**/RunAsAVMDeployHandler.java"/>
+                <exclude name="**/RunAsAVMRemoveAllSrcWebappsHandler.java"/>
+                <exclude name="**/RunAsAVMRemoveWFStoreHandler.java"/>
+                <exclude name="**/launch.get.js"/>
+            </fileset>
+        </zip>
+    </target>
+
+</project>

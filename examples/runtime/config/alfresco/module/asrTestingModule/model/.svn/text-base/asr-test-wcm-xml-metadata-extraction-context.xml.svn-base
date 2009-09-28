@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- Article XML Metadata Extractor -->
+    <bean id="osc.xml.metadata.extractor.article"
+          class="org.alfresco.repo.content.metadata.xml.XPathMetadataExtracter"
+          parent="baseMetadataExtracter"
+          init-method="init">
+        <property name="supportedDateFormats">
+            <list>
+                <!--<value>yyyy.MM.dd G 'at' HH:mm:ss z</value>-->
+                <value>yyyy-MM-dd</value>
+            </list>
+        </property>
+        <property name="mappingProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="properties">
+                    <props>
+                        <prop key="namespace.prefix.osc">http://www.alfresco.org/alfresco/osc/contentmodel</prop>
+                        <prop key="title">osc:articletitle</prop>
+                        <prop key="author">osc:articleauthor</prop>
+                        <prop key="location">osc:articlelocation</prop>
+                        <prop key="teaser">osc:articleteaser</prop>
+                        <prop key="body">osc:articlebody</prop>
+                        <prop key="launch_date">osc:articlelaunchdate</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+        <property name="xpathMappingProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="properties">
+                    <props>
+                        <prop key="namespace.prefix.osc">http://www.alfresco.org/alfresco/osc/contentmodel</prop>
+                        <prop key="title">/article/title/text()</prop>
+                        <prop key="author">/article/author/text()</prop>
+                        <prop key="location">/article/location/text()</prop>
+                        <prop key="teaser">/article/teaser/text()</prop>
+                        <prop key="body">/article/body/text()</prop>
+                        <prop key="launch_date">/article/launch_date/text()</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+
+    <!--News Flash XML Metadata Extractor -->
+    <bean id="osc.xml.metadata.extractor.newsflash"
+          class="org.alfresco.repo.content.metadata.xml.XPathMetadataExtracter"
+          parent="baseMetadataExtracter"
+          init-method="init">
+        <property name="supportedDateFormats">
+            <list>
+                <!--<value>yyyy.MM.dd G 'at' HH:mm:ss z</value>-->
+                <value>yyyy-MM-dd</value>
+            </list>
+        </property>
+        <property name="mappingProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="properties">
+                    <props>
+                        <prop key="namespace.prefix.osc">http://www.alfresco.org/alfresco/osc/contentmodel</prop>
+                        <prop key="title">osc:flashtitle</prop>
+                        <prop key="body">osc:flashbody</prop>
+                        <prop key="launch_date">osc:flashlaunchdate</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+        <property name="xpathMappingProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="properties">
+                    <props>
+                        <prop key="title">/news_flash/title/text()</prop>
+                        <prop key="body">/news_flash/body/text()</prop>
+                        <prop key="launch_date">/news_flash/launch_date/text()</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+
+    <!-- This bean determines which metadata extractor to use, based on the root element of the XML file -->
+  <bean id="osc.xml.metadata.extractor.XPathSelector"
+         class="org.alfresco.repo.content.selector.XPathContentWorkerSelector"
+         init-method="init">
+    <property name="workers">
+      <map>
+        <entry key="/article">
+          <ref bean="osc.xml.metadata.extractor.article" />
+        </entry>
+        <entry key="/news_flash">
+          <ref bean="osc.xml.metadata.extractor.newsflash" />
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+
+  <!--
+     This is the face of the XML metadata extraction.  If passes the XML document to each of
+     the selectors, until one of them gives back a MetadataExtracter (via the selectors),
+     which is then used to extract the metadata values.
+     Note the use of the AVM-specific registry.
+     The overwrite policy of the embedded extracters has no effect.  It is only this extractor's
+     policy that is used.
+  -->
+  <bean id="osc.xml.metadata.extractor.XMLMetadataExtracter"
+         class="org.alfresco.repo.content.metadata.xml.XmlMetadataExtracter"
+         parent="baseMetadataExtracter">
+    <property name="registry"        ref="avmMetadataExtracterRegistry" />
+    <property name="overwritePolicy" value="EAGER" />
+    <property name="selectors">
+      <list>
+        <ref bean="osc.xml.metadata.extractor.XPathSelector" />
+      </list>
+    </property>
+  </bean>
+
+
+  <!-- Beans that enable XML Metadata Extraction in Web Projects -->
+  <bean id="avmMetadataExtracterRegistry" class="org.alfresco.repo.content.metadata.MetadataExtracterRegistry" />
+
+  <bean id="avmNodeService" class="org.alfresco.repo.avm.AVMNodeService" init-method="init">
+    <property name="dictionaryService" ref="dictionaryService" />
+    <property name="avmService"        ref="avmLockingAwareService" />
+    <property name="policyComponent"   ref="policyComponent" />
+    <property name="invokePolicies"    value="true" />
+  </bean>
+
+  <bean id="avmMetadataExtracter" class="org.alfresco.repo.avm.AvmMetadataExtracter" init-method="init">
+    <property name="policyComponent" ref="policyComponent" />
+    <property name="extracterAction">
+      <bean class="org.alfresco.repo.action.executer.ContentMetadataExtracter" >
+        <property name="dictionaryService"         ref="dictionaryService" />
+        <property name="nodeService"               ref="avmNodeService" />
+        <property name="contentService"            ref="contentService" />
+        <property name="metadataExtracterRegistry" ref="avmMetadataExtracterRegistry" />
+        <property name="carryAspectProperties"     value="true" />
+      </bean>
+    </property>
+  </bean>
+
+</beans>
