@@ -4,7 +4,7 @@
   <bean id="osc_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
     <property name="models">
       <list>
-        <value>alfresco/module/wcmOffSiteChallengeAsr/model/asrTestModel.xml</value>
+        <value>alfresco/module/asrTestingModule/model/asrTestModel.xml</value>
       </list>
     </property>
   </bean>

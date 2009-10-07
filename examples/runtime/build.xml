@@ -141,6 +141,7 @@
             <fileset dir="${project.dir}" >
                 <exclude name="config/**/asr-test-wcm-xml-metadata-extraction-context.xml" />
                 <exclude name="config/**/module-context.xml" />
+                <exclude name="config/**/module.properties" />
                 <include name="config/**/*.*" />
             </fileset>
             <fileset dir="${build.dir}" >
